@@ -1,0 +1,148 @@
+export const audioFiles = [
+    {
+        src: "./kick.mp3",
+        key: "kick",
+    },
+    {
+        src: "./snare.mp3",
+        key: "snare",
+    },
+    {
+        src: "./hithat.mp3",
+        key: "hithat",
+    },
+];
+
+export const eventListeners = [
+    "click",
+    "mousemove",
+    "keydown",
+    "scroll",
+    "touchstart",
+];
+
+export const DEFAUL_VOL = -12;
+export const DEFAULT_PAN = 0;
+export const piano_notes = [
+    { note: "C1" },
+    { note: "C#1" },
+    { note: "D1" },
+    { note: "D#1" },
+    { note: "E1" },
+    { note: "F1" },
+    { note: "F#1" },
+    { note: "G1" },
+    { note: "G#1" },
+    { note: "A1" },
+    { note: "A#1" },
+    { note: "B1" },
+    { note: "C2" },
+    { note: "C#2" },
+    { note: "D2" },
+    { note: "D#2" },
+    { note: "E2" },
+    { note: "F2" },
+    { note: "F#2" },
+    { note: "G2" },
+    { note: "G#2" },
+    { note: "A2" },
+    { note: "A#2" },
+    { note: "B2" },
+    { note: "C3" },
+    { note: "C#3" },
+    { note: "D3" },
+    { note: "D#3" },
+    { note: "E3" },
+    { note: "F3" },
+    { note: "F#3" },
+    { note: "G3" },
+    { note: "G#3" },
+    { note: "A3" },
+    { note: "A#3" },
+    { note: "B3" },
+    { note: "C4" },
+    { note: "C#4" },
+    { note: "D4" },
+    { note: "D#4" },
+    { note: "E4" },
+    { note: "F4" },
+    { note: "F#4" },
+    { note: "G4" },
+    { note: "G#4" },
+    { note: "A4" },
+    { note: "A#4" },
+    { note: "B4" },
+    { note: "C5" },
+    { note: "C#5" },
+    { note: "D5" },
+    { note: "D#5" },
+    { note: "E5" },
+    { note: "F5" },
+    { note: "F#5" },
+    { note: "G5" },
+    { note: "G#5" },
+    { note: "A5" },
+    { note: "A#5" },
+    { note: "B5" },
+    { note: "C6" },
+    { note: "C#6" },
+    { note: "D6" },
+    { note: "D#6" },
+    { note: "E6" },
+    { note: "F6" },
+    { note: "F#6" },
+    { note: "G6" },
+    { note: "G#6" },
+    { note: "A6" },
+    { note: "A#6" },
+    { note: "B6" },
+    { note: "C7" },
+];
+
+export const piano_notes_twoo_oct = [
+    [
+        { note: "C5" },
+        { note: "C#5" },
+        { note: "D5" },
+        { note: "D#5" },
+        { note: "E5" },
+        { note: "F5" },
+        { note: "F#5" },
+        { note: "G5" },
+        { note: "G#5" },
+        { note: "A5" },
+        { note: "A#5" },
+        { note: "B5" },
+    ],
+    [
+        { note: "C4" },
+        { note: "C#4" },
+        { note: "D4" },
+        { note: "D#4" },
+        { note: "E4" },
+        { note: "F4" },
+        { note: "F#4" },
+        { note: "G4" },
+        { note: "G#4" },
+        { note: "A4" },
+        { note: "A#4" },
+        { note: "B4" },
+    ],
+];
+
+
+export const nonNaturalClasses = {
+    "C#": " bottom-[10%]",
+    "D#": " bottom-[26%]",
+    "F#": " top-[40%]",
+    "G#": " top-[25%]",
+    "A#": " top-[10%]",
+};
+
+export const rowType: {
+    synth: "SYNTH";
+    beat: "BEAT";
+} = {
+    synth: "SYNTH",
+    beat: "BEAT",
+};
