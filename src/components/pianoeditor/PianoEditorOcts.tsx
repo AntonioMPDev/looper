@@ -1,61 +1,58 @@
-import { CiMenuFries } from "react-icons/ci";
-import { piano_notes_twoo_oct } from "../../constants";
-import PianoEditorOct from "./PianoEditorOct";
-import { useContext, useState } from "react";
+import { DEFAUL_VOL, DEFAULT_PAN } from "../../constants";
+import { useContext, useMemo, useState } from "react";
 import Modal from "../modals";
 import { AppContext } from "../context/AppContext";
+import VolPanControls from "../controls/VolPanControls";
+import PianoRoll from "./PianoRoll";
+import PianoEditorMenu from "./PianoEditorMenu";
+import MarkersNumbers from "./MarkersNumbers";
+import Marker from './Marker';
 
 export default function PianoEditorOcts() {
     const [popUpActive, setPopupActive] = useState(false);
-    const { setIsPianoEditor, setModalOpen, modalOpen } =
+    const { setIsPianoEditor, setModalOpen, modalOpen, rows, currentRow } =
         useContext(AppContext);
+    const octs = useMemo(
+        () => rows.find((item) => item.key === currentRow),
+        [currentRow, rows]
+    )?.notes;
+
+    if (!octs) {
+        return null;
+    }
 
     const commonClasses =
-        "w-full sm:pl-24 pl-16 h-full flex max-h-[800px] absolute right-0";
+        "w-full sm:pl-24 pl-16 flex max-h-[800px] absolute right-0";
     return (
         <>
-            <div className={`flex-col ${commonClasses}`}>
-                <div className="w-full h-full bg-gray-900 bg-opacity-75">
-                    {piano_notes_twoo_oct.map((oct, i) => (
-                        <PianoEditorOct oct={oct} key={i} />
-                    ))}
-                </div>
-            </div>
-            <div className={`flex-col ${commonClasses}`}>
-                <div className="absolute sm:pl-24 pl-16 w-full h-8 -top-[2em] right-0 bg-gray-800">
-                    <div className="absolute z-20 top-0 right-0 flex mr-1 items-center h-full">
+            <Marker commonClasses={commonClasses} />
+            <PianoRoll octs={octs} commonClasses={commonClasses} />
+            <PianoEditorMenu
+                commonClasses={commonClasses}
+                setPopupActive={setPopupActive}
+            />
+            <MarkersNumbers commonClasses={commonClasses} />
+            <Modal isOpen={popUpActive} onClose={() => setPopupActive(false)}>
+                <div className="pb-10">
+                    <div>
+                        <VolPanControls
+                            defaulVoltValue={DEFAUL_VOL}
+                            defaulPanValue={DEFAULT_PAN}
+                            onValueRawVolChange={() => 0}
+                            onValueRawPanChange={() => 0}
+                        />
+                    </div>
+                    <div className="pt-10 px-2 w-full flex flex-start absolute bottom-2 left-0">
                         <button
-                            className="p-1 sm:mt-0 mt-1"
-                            onClick={() => setPopupActive(true)}
+                            className="bg-gray-800 py-2 px-4 rounded text-xs w-full"
+                            onClick={() => {
+                                setIsPianoEditor(false);
+                                setModalOpen({ ...modalOpen, open: false });
+                            }}
                         >
-                            <CiMenuFries className="text-xl" />
+                            Close
                         </button>
                     </div>
-                </div>
-            </div>
-            <div className={`${commonClasses} pointer-events-none`}>
-                {Array.from({ length: 4 }).map((_, i) => (
-                    <div
-                        key={i}
-                        className="w-[25%] h-full border-r border-gray-600/80"
-                    >
-                        <div className="text-xs opacity-60 absolute -top-4 ml-px">
-                            {i + 1}
-                        </div>
-                    </div>
-                ))}
-            </div>
-            <Modal isOpen={popUpActive} onClose={() => setPopupActive(false)}>
-                <div className="pt-10 px-6 flex flex-start">
-                    <button
-                        className="bg-gray-800 py-2 px-4 rounded text-sm"
-                        onClick={() => {
-                            setIsPianoEditor(false)
-                            setModalOpen({ ...modalOpen, open: false });
-                        }}
-                    >
-                        Close
-                    </button>
                 </div>
             </Modal>
         </>

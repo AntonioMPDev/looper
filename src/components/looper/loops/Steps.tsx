@@ -16,22 +16,17 @@ export default function Steps({
 
     return (
         <div className="w-[75%]">
-            {rowIndex === 0 ? (
-                <div className="flex flex-wrap gap-1 w-full sm:mb-0 mb-1">
-                    {rowItem.steps.map((_, i) => (
+            <div className="flex flex-wrap gap-1 w-full sm:mb-0 mb-1">
+                {rowItem.steps.map((_, i) => (
+                    <span key={i} className={`${stepSize} flex px-[3px] mb-1`}>
                         <span
-                            key={i}
-                            className={`${stepSize} flex px-[3px] mb-1`}
-                        >
-                            <span
-                                className={`${getMarkerColorCssClasses(
-                                    i
-                                )} w-full h-px`}
-                            ></span>
-                        </span>
-                    ))}
-                </div>
-            ) : null}
+                            className={`${getMarkerColorCssClasses(
+                                i
+                            )} w-full h-px`}
+                        ></span>
+                    </span>
+                ))}
+            </div>
             <div className="flex flex-wrap gap-1 w-full">
                 {rowItem.steps.map((step, i) => (
                     <Step

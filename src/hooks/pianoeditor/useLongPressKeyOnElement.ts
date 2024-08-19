@@ -1,54 +1,77 @@
 import { useCallback, useContext, useState } from "react";
 import { PianoContext } from "../../components/context/PianoEditorContext";
 import * as Tone from "tone";
+import { AppContext } from "../../components/context/AppContext";
 
-const synth = new Tone.Synth({
-    envelope: {
-        decay: 0.2, // time to reach sustain level
-        sustain: 0.5, // level during the hold
-        release: 0.4, // short release time
-    },
-    oscillator: {
-        type: "sawtooth",
-    },
-}).toDestination();
+export function hightLightNoteRow(isHighLighted: boolean, note: string) {
+    const hightligtEl = document.getElementById(`row-note-${note}`);
+    if (isHighLighted) {
+        hightligtEl?.classList.add("higlight-note-row");
+    } else {
+        hightligtEl?.classList.remove("higlight-note-row");
+    }
+}
 
 export default function useLongPressKeyOnElement(note: string) {
     const [holdDuration, setHoldDuration] = useState(0);
     const { pianoNotesData, setPianoNotesData, setStillHolding, stillHolding } =
         useContext(PianoContext);
+    const { currentRow, synthRef } = useContext(AppContext);
     const [isTouch, setIsTouch] = useState(false);
 
+    const hightLightNote = useCallback(
+        function (isHighLighted: boolean) {
+            hightLightNoteRow(isHighLighted, note);
+        },
+        [note]
+    );
+
     const stop = useCallback(() => {
-        synth.triggerRelease();
-        if (pianoNotesData[note] && pianoNotesData[note].timer) {
-            clearInterval(pianoNotesData[note].timer);
+        hightLightNote(false);
+        if (synthRef.current) {
+            const sytnhObj = synthRef.current[currentRow];
+            sytnhObj.synth.triggerRelease();
+            if (pianoNotesData[note] && pianoNotesData[note].timer) {
+                clearInterval(pianoNotesData[note].timer);
+                setPianoNotesData({
+                    ...pianoNotesData,
+                    [note]: {
+                        timer: 0,
+                        isHolding: false,
+                        holdDuration: 0,
+                    },
+                });
+            }
+        }
+    }, [
+        currentRow,
+        hightLightNote,
+        note,
+        pianoNotesData,
+        setPianoNotesData,
+        synthRef,
+    ]);
+
+    const start = () => {
+        hightLightNote(true);
+        Tone.start();
+        if (synthRef.current) {
+            const sytnhObj = synthRef.current[currentRow];
+
+            sytnhObj.synth.triggerAttack(note);
+            setStillHolding(true);
+            const timer = setInterval(() => {
+                setHoldDuration((prevDuration) => prevDuration + 100);
+            }, 100);
             setPianoNotesData({
                 ...pianoNotesData,
                 [note]: {
-                    timer: 0,
-                    isHolding: false,
-                    holdDuration: 0,
+                    timer,
+                    isHolding: true,
+                    holdDuration,
                 },
             });
         }
-    }, [note, pianoNotesData, setPianoNotesData]);
-
-    const start = () => {
-        Tone.start();
-        synth.triggerAttack(note);
-        setStillHolding(true);
-        const timer = setInterval(() => {
-            setHoldDuration((prevDuration) => prevDuration + 100);
-        }, 100);
-        setPianoNotesData({
-            ...pianoNotesData,
-            [note]: {
-                timer,
-                isHolding: true,
-                holdDuration,
-            },
-        });
     };
 
     const handleMouseDown = (

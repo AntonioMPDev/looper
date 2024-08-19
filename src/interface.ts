@@ -1,11 +1,15 @@
 import * as Tone from "tone";
-import { Player, Panner } from "tone";
+import { Player, Panner, Synth } from "tone";
 import { KnobHeadless } from "react-knob-headless";
-import { KnobBaseThumb } from "./components/knob/KnobBaseThumb";
-import { KnobBase } from "./components/knob/KnobBase";
+import { KnobBaseThumb } from "./components/looper/knob/KnobBaseThumb";
+import { KnobBase } from "./components/looper/knob/KnobBase";
 
 export interface Players {
     [key: string]: { player: Tone.Player; panner: Tone.Panner };
+}
+
+export interface Synths {
+    [key: string]: { synth: Tone.Synth; panner: Tone.Panner };
 }
 
 export type PlayerRef = React.MutableRefObject<
@@ -18,6 +22,15 @@ export type PlayerRef = React.MutableRefObject<
     | undefined
 >;
 
+export type SynthRef = React.MutableRefObject<
+    | {
+          [key: string]: {
+              synth: Synth<Tone.SynthOptions>;
+              panner: Panner;
+          };
+      }
+    | undefined
+>;
 export type KnobHeadlessProps = React.ComponentProps<typeof KnobHeadless>;
 export type KnobBaseThumbProps = React.ComponentProps<typeof KnobBaseThumb>;
 export type KnobBaseProps = Pick<

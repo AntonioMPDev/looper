@@ -1,4 +1,4 @@
-import { createContext, useState } from 'react';
+import { createContext, useRef, useState } from 'react';
 
 type PianoNotesData = Record<
     string,
@@ -14,11 +14,16 @@ export const PianoContext = createContext<{
     setPianoNotesData: React.Dispatch<React.SetStateAction<PianoNotesData>>;
     stillHolding: boolean;
     setStillHolding: React.Dispatch<React.SetStateAction<boolean>>;
+    pianoRollContainerRef: React.RefObject<HTMLDivElement>;
+    pianoRollMarkerRef: React.RefObject<HTMLDivElement>;
 }>({
     pianoNotesData: {},
     setPianoNotesData: () => {},
     stillHolding: false,
     setStillHolding: () => {},
+    pianoRollContainerRef: {} as React.RefObject<HTMLDivElement>,
+    pianoRollMarkerRef: {} as React.RefObject<HTMLDivElement>
+
 });
 
 export const PianoProvider = ({ children }: { children: React.ReactNode }) => {
@@ -26,6 +31,10 @@ export const PianoProvider = ({ children }: { children: React.ReactNode }) => {
         {} as PianoNotesData
     );
     const [stillHolding, setStillHolding] = useState<boolean>(false);
+    const pianoRollContainerRef = useRef<HTMLDivElement>(null);
+    const pianoRollMarkerRef = useRef<HTMLDivElement>(null);
+
+
     return (
         <PianoContext.Provider
             value={{
@@ -33,6 +42,8 @@ export const PianoProvider = ({ children }: { children: React.ReactNode }) => {
                 setPianoNotesData,
                 stillHolding,
                 setStillHolding,
+                pianoRollContainerRef,
+                pianoRollMarkerRef,
             }}
         >
             {children}

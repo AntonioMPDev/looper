@@ -1,5 +1,6 @@
 import { useCallback, useContext, useMemo, useState } from "react";
 import { AppContext, Rows } from "../components/context/AppContext";
+import { rowType } from "../constants";
 
 export default function useStep(
     step: Rows[0]["steps"][0],
@@ -7,7 +8,8 @@ export default function useStep(
     rowIndex: number
 ) {
     const [active, setActive] = useState(step.active);
-    const { rows, setRows, beatPosition } = useContext(AppContext);
+    const { rows, setRows, beatPosition, setIsPianoEditor, setCurrrentRow } =
+        useContext(AppContext);
 
     const bg = useMemo(
         () => (condition ? "bg-cyan-950" : "bg-cyan-900"),
@@ -18,14 +20,20 @@ export default function useStep(
         function () {
             const newStepActive = !active;
             const rowsCopy = [...rows];
-            const stepsOfCurrentRow = rowsCopy[rowIndex].steps;
-            const currentStep = stepsOfCurrentRow[step.i];
-            currentStep.active = newStepActive;
+            const row = rowsCopy[rowIndex];
+            if (row.type !== rowType.synth) {
+                const stepsOfCurrentRow = row.steps;
+                const currentStep = stepsOfCurrentRow[step.i];
+                currentStep.active = newStepActive;
 
-            setActive(newStepActive);
-            setRows(rowsCopy);
+                setActive(newStepActive);
+                setRows(rowsCopy);
+            } else {
+                setCurrrentRow(row.key);
+                setIsPianoEditor(true);
+            }
         },
-        [active, rowIndex, rows, setRows, step.i]
+        [active, rowIndex, rows, setCurrrentRow, setIsPianoEditor, setRows, step.i]
     );
 
     const getStepColor = useCallback(

@@ -1,6 +1,6 @@
 import { createContext, useRef, useState } from "react";
 import React from "react";
-import { Player, Panner } from "tone";
+import { Player, Panner, Synth, SynthOptions } from "tone";
 import { IconType } from "react-icons";
 import { rowsData } from "./initial";
 
@@ -22,7 +22,7 @@ export type Rows = {
         active: boolean;
         context: unknown;
         i: number;
-    }[][][][];
+    }[][][];
 }[];
 
 type ModalType = "ROW_OPEN";
@@ -35,6 +35,15 @@ export const AppContext = createContext<{
     setIsLoading: React.Dispatch<React.SetStateAction<boolean>>;
     playerRef: React.MutableRefObject<
         { [key: string]: { player: Player; panner: Panner } } | undefined
+    >;
+    synthRef: React.MutableRefObject<
+        | {
+              [key: string]: {
+                  synth: Synth<SynthOptions>;
+                  panner: Panner;
+              };
+          }
+        | undefined
     >;
     bpm: number[];
     setBpm: React.Dispatch<React.SetStateAction<number[]>>;
@@ -57,6 +66,9 @@ export const AppContext = createContext<{
     setIsLoading: () => {},
     playerRef: {} as React.MutableRefObject<
         { [key: string]: { player: Player; panner: Panner } } | undefined
+    >,
+    synthRef: {} as React.MutableRefObject<
+        { [key: string]: { synth: Synth; panner: Panner } } | undefined
     >,
     bpm: [120],
     setBpm: () => {},
@@ -82,6 +94,9 @@ export const AppStateProvider = ({
     const playerRef = useRef<{
         [key: string]: { player: Player; panner: Panner };
     }>();
+    const synthRef = useRef<{
+        [key: string]: { synth: Synth; panner: Panner };
+    }>();
     const [bpm, setBpm] = useState<number[]>([120]);
     const [beatPosition, setBeatPosition] = useState(0);
     const [isPlaying, setIsPlaying] = useState(false);
@@ -100,6 +115,7 @@ export const AppStateProvider = ({
                 isLoading,
                 setIsLoading,
                 playerRef,
+                synthRef,
                 bpm,
                 setBpm,
                 beatPosition,

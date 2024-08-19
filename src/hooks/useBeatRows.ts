@@ -14,7 +14,7 @@ export default function useBeatRows() {
     const { playerRef, modalOpen, rows, currentRow } = useContext(AppContext);
     const canvasRef = useRef<null | HTMLCanvasElement>(null);
     const [showDetails, setShowDetails] = useState(false);
-    const getDefaultValues = useCallback(function getDefaultValues(
+    const getDefaultValues = useCallback(function (
         playerRef: PlayerRef,
         defaultValue: number
     ) {

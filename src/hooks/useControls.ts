@@ -3,19 +3,38 @@ import { interval, takeUntil, Subject, Subscription } from "rxjs";
 import { AppContext } from "../components/context/AppContext";
 import { getBeats } from "../utils/time";
 import * as Tone from "tone";
+import { rowType } from "../constants";
 
 let loopI = 0;
 
-export default function useControls() {
+export default function useControls(
+    isPlayingLocal?: boolean,
+    setIsPlayingLocal?: React.Dispatch<React.SetStateAction<boolean>>,
+    onKeySpace?: () => void
+) {
     const stop$ = useRef(new Subject<void>()).current;
     const subscriptionRef = useRef<Subscription>();
-    const { bpm, setIsPlaying, isPlaying, setBeatPosition, rows, playerRef } =
-        useContext(AppContext);
+    const {
+        bpm,
+        setIsPlaying,
+        isPlaying,
+        setBeatPosition,
+        rows,
+        playerRef,
+        synthRef,
+        isPianoEditor,
+    } = useContext(AppContext);
 
     const start = useCallback(
         (cb?: (v: number) => void) => {
-            if (isPlaying) return;
-            setIsPlaying(true);
+            if (isPlaying || isPlayingLocal) return;
+            console.log("Start executed");
+
+            if (!setIsPlayingLocal) {
+                setIsPlaying(true);
+            } else {
+                setIsPlayingLocal(true);
+            }
 
             const source$ = interval(getBeats(bpm[0]));
             const subscription = source$.pipe(takeUntil(stop$)).subscribe({
@@ -27,27 +46,41 @@ export default function useControls() {
                 error: (err) => console.error("Error:", err),
                 complete: () => {
                     console.log("Interval completed");
-                    setIsPlaying(false);
+                    if (!setIsPlayingLocal) {
+                        setIsPlaying(false);
+                    } else {
+                        setIsPlayingLocal(false);
+                    }
                 },
             });
 
             subscriptionRef.current = subscription;
         },
-        [bpm, isPlaying, setIsPlaying, stop$]
+        [bpm, isPlaying, isPlayingLocal, setIsPlaying, setIsPlayingLocal, stop$]
     );
 
-    const stop = useCallback(() => {
-        loopI = 0;
-        if (!isPlaying) return;
-        setIsPlaying(false);
+    const stop = useCallback(
+        (isPlayingLocal?: boolean) => {
+            loopI = 0;
 
-        stop$.next();
-        stop$.complete();
+            if (!isPlaying && !isPlayingLocal) return;
+            console.log("Stop executed");
 
-        if (subscriptionRef.current) {
-            subscriptionRef.current.unsubscribe();
-        }
-    }, [isPlaying, setIsPlaying, stop$]);
+            if (!setIsPlayingLocal) {
+                setIsPlaying(false);
+            } else {
+                setIsPlayingLocal(false);
+            }
+
+            stop$.next();
+            stop$.complete();
+
+            if (subscriptionRef.current) {
+                subscriptionRef.current.unsubscribe();
+            }
+        },
+        [isPlaying, setIsPlaying, setIsPlayingLocal, stop$]
+    );
 
     const loop = useCallback((cb: (i: number) => void) => {
         cb(loopI);
@@ -57,16 +90,17 @@ export default function useControls() {
             loopI = 0;
         }
     }, []);
-    
+
     const handleStart = useCallback(
         function () {
             Tone.start();
+
             start(() => {
                 loop((i) => {
                     setBeatPosition(i);
                     rows.forEach((row) => {
                         const beat = row.steps[i];
-                        if (beat.active) {
+                        if (beat.active && row.type === rowType.beat) {
                             const player =
                                 playerRef.current &&
                                 playerRef.current[row.key].player;
@@ -74,11 +108,29 @@ export default function useControls() {
                                 player.start();
                             }
                         }
+
+                        if (row.type === rowType.synth) {
+                            const octs = row.notes;
+                            octs?.forEach((oct) => {
+                                oct.forEach((noteLine) => {
+                                    const beat = noteLine[i];
+                                    if (beat.active && synthRef.current) {
+                                        const synthObj =
+                                            synthRef.current[row.key];
+
+                                        synthObj.synth.triggerAttackRelease(
+                                            beat.note.note,
+                                            "12n"
+                                        );
+                                    }
+                                });
+                            });
+                        }
                     });
                 });
             });
         },
-        [loop, playerRef, rows, setBeatPosition, start]
+        [loop, playerRef, rows, setBeatPosition, start, synthRef]
     );
 
     const handleStop = useCallback(() => {
@@ -86,22 +138,49 @@ export default function useControls() {
         setBeatPosition(0);
     }, [setBeatPosition, stop]);
 
-    useEffect(() => {
+    const addEventListenerForSpace = useCallback((cb: () => void) => {
         const fn = (e: KeyboardEvent) => {
             if (e.code === "Space") {
+                cb();
+            }
+        };
+        document.addEventListener("keydown", fn);
+
+        return fn;
+    }, []);
+
+    const removeEventListenerForSpace = useCallback(
+        (fn: (e: KeyboardEvent) => void) => {
+            document.removeEventListener("keydown", fn);
+        },
+        []
+    );
+
+    useEffect(() => {
+        const fn = addEventListenerForSpace(() => {
+            if (isPianoEditor && onKeySpace) {
+                onKeySpace();
+            } else {
                 if (!isPlaying) {
                     handleStart();
                 } else {
                     handleStop();
                 }
             }
-        };
-        document.addEventListener("keydown", fn);
+        });
 
         return () => {
-            document.removeEventListener("keydown", fn);
+            removeEventListenerForSpace(fn);
         };
-    }, [handleStart, handleStop, isPlaying]);
+    }, [
+        addEventListenerForSpace,
+        handleStart,
+        handleStop,
+        isPianoEditor,
+        isPlaying,
+        onKeySpace,
+        removeEventListenerForSpace,
+    ]);
 
     useEffect(() => {
         return () => {
@@ -114,5 +193,14 @@ export default function useControls() {
         };
     }, [stop$]);
 
-    return { start, stop, isPlaying, loop, handleStart, handleStop };
+    return {
+        start,
+        stop,
+        isPlaying,
+        loop,
+        handleStart,
+        handleStop,
+        addEventListenerForSpace,
+        removeEventListenerForSpace,
+    };
 }

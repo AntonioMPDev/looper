@@ -7,7 +7,7 @@ export default function Piano() {
     const { setStillHolding } = useContext(PianoContext);
 
     return (
-        <div className="flex flex-col w-24 left-0 h-full max-h-[800px] absolute z-10">
+        <div className="flex flex-col sm:w-24 w-16 left-0 h-full max-h-[800px] absolute z-10">
             {piano_notes_twoo_oct.map((oct, i) => (
                 <div
                     key={i}

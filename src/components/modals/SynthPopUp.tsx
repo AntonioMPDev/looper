@@ -1,8 +1,53 @@
-import { useContext, useMemo } from 'react';
-import { AppContext } from '../context/AppContext';
-import { DEFAUL_VOL, DEFAULT_PAN, rowType } from '../../constants';
-import PopUp from './PopUp';
-import RangeSlider from '../looper/ranges/RangeSlider';
+import { useCallback, useContext, useEffect, useMemo, useState } from "react";
+import { AppContext } from "../context/AppContext";
+import { DEFAUL_VOL, DEFAULT_PAN, rowType } from "../../constants";
+import PopUp from "./PopUp";
+import VolPanControls from "../controls/VolPanControls";
+import { SynthRef } from "../../interface";
+
+function useSynthPopUp() {
+    const { synthRef, currentRow } = useContext(AppContext);
+
+    const getDefaultValues = useCallback(function (
+        synthRef: SynthRef,
+        defaultValue: number
+    ) {
+        const defaultValues: Record<string, number> = {};
+        Object.entries(synthRef.current ?? {}).forEach((item) => {
+            defaultValues[item[0]] = defaultValue;
+        });
+
+        return defaultValues;
+    },
+    []);
+
+    const [volume, setVolume] = useState(
+        getDefaultValues(synthRef, DEFAUL_VOL)
+    );
+    const [pan, setPan] = useState(getDefaultValues(synthRef, DEFAULT_PAN));
+
+    function handleVolume(v: number) {
+        setVolume({ ...volume, [currentRow]: v });
+        return v;
+    }
+
+    function handlePan(v: number) {
+        setPan({ ...pan, [currentRow]: v });
+        return v;
+    }
+
+    useEffect(() => {
+        if (synthRef.current && synthRef.current[currentRow]) {
+            const playerObj = synthRef.current[currentRow];
+            playerObj.synth.set({
+                volume: volume[currentRow] ?? DEFAUL_VOL,
+            });
+            playerObj.panner.pan.value = pan[currentRow] ?? DEFAULT_PAN;
+        }
+    }, [currentRow, pan, synthRef, volume]);
+
+    return { handleVolume, handlePan, volume, pan };
+}
 
 export default function SynthPopUp() {
     const { currentRow, rows } = useContext(AppContext);
@@ -11,6 +56,7 @@ export default function SynthPopUp() {
     }, [currentRow, rows]);
     const Icon = row?.icon;
     const { isPianoEditor, setIsPianoEditor } = useContext(AppContext);
+    const { handleVolume, volume, handlePan, pan } = useSynthPopUp();
 
     if (row?.type === rowType.beat || isPianoEditor) {
         return null;
@@ -23,28 +69,12 @@ export default function SynthPopUp() {
                     <div>{Icon ? <Icon /> : null}</div>
                     <div>{row?.label}</div>
                 </div>
-                <div className={`flex items-center gap-2 py-4 pb-8`}>
-                    <div className="flex gap-4">
-                        <div className="flex justify-center items-center gap-2">
-                            <RangeSlider
-                                min={-60}
-                                max={-1}
-                                defaultValue={DEFAUL_VOL}
-                                onValueRawChange={() => {}}
-                            />
-                            <div>Volume</div>
-                        </div>
-                        <div className="flex justify-center items-center gap-2">
-                            <RangeSlider
-                                min={-1}
-                                max={1}
-                                defaultValue={DEFAULT_PAN}
-                                onValueRawChange={() => {}}
-                            />
-                            <div>Pan</div>
-                        </div>
-                    </div>
-                </div>
+                <VolPanControls
+                    defaulVoltValue={volume[currentRow] ?? DEFAUL_VOL}
+                    onValueRawVolChange={handleVolume}
+                    defaulPanValue={pan[currentRow] ?? DEFAULT_PAN}
+                    onValueRawPanChange={handlePan}
+                />
                 <div>
                     <button
                         onClick={() => setIsPianoEditor(true)}
