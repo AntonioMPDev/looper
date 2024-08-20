@@ -9,13 +9,15 @@
         "build": "vite build --config vite/config.prod.mjs && node scripts/copyCssOutput.js"
     },
     "dependencies": {
+        "@wavesurfer/react": "^1.0.7",
         "react": "^18.2.0",
         "react-dom": "^18.2.0",
         "react-icons": "^5.2.1",
         "react-knob-headless": "0.3.0",
         "react-range": "^1.10.0",
         "rxjs": "^7.8.1",
-        "tone": "^15.0.4"
+        "tone": "^15.0.4",
+        "wavesurfer.js": "^7.8.4"
     },
     "devDependencies": {
         "@types/react": "^18.3.3",
@@ -32,4 +34,3 @@
         "vite": "^5.3.1"
     }
 }
-

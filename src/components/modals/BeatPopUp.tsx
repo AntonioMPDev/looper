@@ -15,8 +15,6 @@ export default function BeatPopUp() {
         handleVolume,
         handlePan,
         pan,
-        handleCanvasClick,
-        canvasRef,
     } = useBeatRows();
     const { currentRow } = useContext(AppContext);
 
@@ -37,10 +35,7 @@ export default function BeatPopUp() {
                     defaulPanValue={pan[currentRow] ?? DEFAULT_PAN}
                     onValueRawPanChange={handlePan}
                 />
-                <WaveFormForBeatRow
-                    handleCanvasClick={handleCanvasClick}
-                    canvasRef={canvasRef}
-                />
+                <WaveFormForBeatRow />
             </PopUp>
         </div>
     );

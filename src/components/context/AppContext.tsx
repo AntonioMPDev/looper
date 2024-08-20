@@ -36,6 +36,12 @@ export const AppContext = createContext<{
     playerRef: React.MutableRefObject<
         { [key: string]: { player: Player; panner: Panner } } | undefined
     >;
+    region: { [key: string]: { startAt: number; endsAt: number } };
+    setRegion: React.Dispatch<
+        React.SetStateAction<{
+            [key: string]: { startAt: number; endsAt: number };
+        }>
+    >;
     synthRef: React.MutableRefObject<
         | {
               [key: string]: {
@@ -61,15 +67,17 @@ export const AppContext = createContext<{
     setIsPianoEditor: React.Dispatch<React.SetStateAction<boolean>>;
 }>({
     rows: [],
-    setRows: () => {},
+    setRows: () => { },
     isLoading: true,
-    setIsLoading: () => {},
+    setIsLoading: () => { },
     playerRef: {} as React.MutableRefObject<
         { [key: string]: { player: Player; panner: Panner } } | undefined
     >,
     synthRef: {} as React.MutableRefObject<
         { [key: string]: { synth: Synth; panner: Panner } } | undefined
     >,
+    region: {} as { [key: string]: { startAt: number; endsAt: number } },
+    setRegion: () => {},
     bpm: [120],
     setBpm: () => {},
     beatPosition: 120,
@@ -97,6 +105,7 @@ export const AppStateProvider = ({
     const synthRef = useRef<{
         [key: string]: { synth: Synth; panner: Panner };
     }>();
+    const [region, setRegion] = useState({})
     const [bpm, setBpm] = useState<number[]>([120]);
     const [beatPosition, setBeatPosition] = useState(0);
     const [isPlaying, setIsPlaying] = useState(false);
@@ -116,6 +125,8 @@ export const AppStateProvider = ({
                 setIsLoading,
                 playerRef,
                 synthRef,
+                region,
+                setRegion,
                 bpm,
                 setBpm,
                 beatPosition,

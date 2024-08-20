@@ -76,7 +76,7 @@ export default function useBeatRows() {
 
     useEffect(() => {
         if (modalOpen.open && modalOpen.type === "ROW_OPEN") {
-            drawWaveform();
+            setShowDetails(true);
         }
 
         if (playerRef.current && playerRef.current[currentRow]) {

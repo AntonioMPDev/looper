@@ -4,59 +4,11 @@ import {
 } from "react-icons/md";
 import Steps from "../loops/Steps";
 import useBeatRow from "../../../hooks/useBeatRow";
-import { AppContext, Rows } from "../../context/AppContext";
-import { useCallback, useContext } from "react";
+import {  Rows } from "../../context/AppContext";
+import { useCallback } from "react";
 import { rowType } from "../../../constants";
-
-function NotesVisualizer({ rowIndex }: { rowIndex: number }) {
-    const { rows, setCurrrentRow, setIsPianoEditor } = useContext(AppContext);
-    const row = rows[rowIndex];
-
-    function handleOnclick() {
-        setCurrrentRow(row.key);
-        setIsPianoEditor(true);
-    }
-
-    return (
-        <div
-            className="w-[75%] rounded flex flex-col gap-px overflow-y-auto no-scrollbar max-h-[96px] cursor-pointer pr-[0.25rem]"
-            onClick={handleOnclick}
-        >
-            {row.notes?.map((oct, octI) => (
-                <div
-                    key={octI}
-                    id={`oct-${octI}`}
-                    className="bg-cyan-950 relative pointer-events-none"
-                >
-                    <div className="absolute text-xs opacity-50 p-1">
-                        {oct[11][0].note.note}
-                    </div>
-                    {oct.map((notesArr, notesArrI) => (
-                        <div
-                            key={notesArrI}
-                            id={`notesline-${notesArrI}`}
-                            className="flex gap-1 relative"
-                        >
-                            {notesArr.map((noteObj, noteI) => (
-                                <div
-                                    key={noteI}
-                                    id={`notei-${noteI}`}
-                                    className="md:w-[5.5%] sm:w-[11%] w-[23%] w-[23%] h-2"
-                                >
-                                    {noteObj.active ? (
-                                        <div className="w-full pr-1">
-                                            <div className="w-full h-px bg-gray-400"></div>
-                                        </div>
-                                    ) : null}
-                                </div>
-                            ))}
-                        </div>
-                    ))}
-                </div>
-            ))}
-        </div>
-    );
-}
+import NotesVisualizer from './NotesVisualizer';
+import MakersTime from './MakersTime';
 
 export default function BeatRow({
     rowItem,
@@ -131,9 +83,16 @@ export default function BeatRow({
                     </div>
                 </div>
                 {rowItem.type === rowType.beat ? (
-                    <Steps rowItem={rowItem} rowIndex={rowIndex} />
+                    <Steps
+                        rowItem={rowItem}
+                        rowIndex={rowIndex}
+                        MakersTime={MakersTime}
+                    />
                 ) : (
-                    <NotesVisualizer rowIndex={rowIndex} />
+                    <NotesVisualizer
+                        MakersTime={MakersTime}
+                        rowIndex={rowIndex}
+                    />
                 )}
             </div>
         </div>

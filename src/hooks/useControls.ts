@@ -23,12 +23,12 @@ export default function useControls(
         playerRef,
         synthRef,
         isPianoEditor,
+        region,
     } = useContext(AppContext);
 
     const start = useCallback(
         (cb?: (v: number) => void) => {
             if (isPlaying || isPlayingLocal) return;
-            console.log("Start executed");
 
             if (!setIsPlayingLocal) {
                 setIsPlaying(true);
@@ -64,7 +64,6 @@ export default function useControls(
             loopI = 0;
 
             if (!isPlaying && !isPlayingLocal) return;
-            console.log("Stop executed");
 
             if (!setIsPlayingLocal) {
                 setIsPlaying(false);
@@ -104,8 +103,17 @@ export default function useControls(
                             const player =
                                 playerRef.current &&
                                 playerRef.current[row.key].player;
+                            const regionRow = region[row.key];
                             if (player && "start" in player) {
-                                player.start();
+                                if (regionRow) {
+                                    player.start(
+                                        0,
+                                        regionRow.startAt,
+                                        regionRow.endsAt
+                                    );
+                                } else {
+                                    player.start();
+                                }
                             }
                         }
 
