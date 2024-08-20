@@ -1,2 +1,2 @@
 # looper
-Looper sounds with react
+Looper sounds with react.
